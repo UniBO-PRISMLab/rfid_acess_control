@@ -46,31 +46,21 @@ def landing():
 
 @api.route('/iskeyvalid', methods=['GET'])
 def get_iskeyvalid():
-    global pending_job, timer
-
-    try:
-        key_id = request.args.get('id')
-        logging.info(f"Received key validation request: {key_id}")
-
-        if pending_job is not None:
-            configuration.known_keys.append(key_id)
-            bot.send_message(pending_job, f"Key `{key_id}` was added!", parse_mode='Markdown')
-            logging.info(f"Added new key {key_id} for chat ID {pending_job}.")
-
-            pending_job = None
-            if timer:
-                timer.cancel()
-
-            return 'a'  # Key added
-
-        if key_id in configuration.known_keys:
-            return 'g'  # Key is known
+    global pending_job
+    key_id = request.args.get('id')
+    print(key_id)
+    if pending_job is not None: # I am setting a new key here
+        configuration .known_keys .append(key_id)
+        text = "Key was added!"
+        bot.send_message (pending_job , text)
+        pending_job = None
+        return('a')
+    else:
+        if key_id in configuration.known_keys :
+            return('g')
         else:
-            return 'r'  # Key is unknown
+            return ('r')
 
-    except Exception as e:
-        logging.error(f"Error in /iskeyvalid endpoint: {e}")
-        return 'e', 500
 
 @bot.message_handler(func=lambda msg: True)
 def echo_all(message):
